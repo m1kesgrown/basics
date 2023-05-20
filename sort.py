@@ -14,6 +14,15 @@ os.makedirs(dest_fold_doc, exist_ok=True)
 dest_fold_arc = os.path.join(path, 'Archieve')
 os.makedirs(dest_fold_arc, exist_ok=True)
 
+img_files = []
+vid_files = []
+doc_files = []
+mus_files = []
+arc_files = []
+know_files = [img_files, vid_files, doc_files, mus_files, arc_files]
+know_ext = []
+unknow_ext = []
+
 
 def sort(path):
     for obj in os.listdir(path):
@@ -35,15 +44,8 @@ def normalize(obj_path):
     doc_ext = ('doc', 'docx', 'txt', 'pdf', 'xlsx', 'pptx')
     mus_ext = ('mp3', 'ogg', 'wav', 'amr')
     arc_ext = ('zip', 'gz', 'tar')
-    img_files = []
-    vid_files = []
-    doc_files = []
-    mus_files = []
-    arc_files = []
-    know_files = [img_files, vid_files, doc_files, mus_files, arc_files]
-    know_ext = []
-    unknow_ext = []
 
+    dir_path, name = os.path.split(obj_path)
     CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
     TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
                    "f", "h", "ts", "ch", "sh", "sch", "", "y", "", "e", "yu", "ya", "je", "i", "ji", "g")
@@ -52,14 +54,13 @@ def normalize(obj_path):
         TRANS[ord(c.lower())] = t.lower()
         TRANS[ord(c.upper())] = t.upper()
 
-    dir_path, new_name = os.path.split(obj_path)
-    new_name = new_name.translate(TRANS)
+    new_name = name.translate(TRANS)
     parts = new_name.split('.')
 
     symbol_for_change = ['!', '@', '#', '$', '%', '^', '&', '*', "'", '.',
                          '(', ')', '-', '+', '{', '}', '`', '|', '"', '№', ';', '%', ':', '?', '*', '/', '', ' ']
     file_name = '.'.join(parts[:-1])
-    ext = parts[-1]
+    ext = parts[-1].lower()
 
     norm_name = ''
     for char in file_name:
@@ -67,58 +68,55 @@ def normalize(obj_path):
             norm_name += '_'
         else:
             norm_name += char
-
-    final_name = f'{norm_name}.{ext}'
-    obj_path = os.path.join(dir_path, final_name)
+    file_name = f'{norm_name}.{ext}'
+    ren_f = os.path.join(dir_path, file_name)
 
     if ext in img_ext:
         count = 1
-        final_path = os.path.join(dest_fold_im, final_name)
+        final_path = os.path.join(dest_fold_im, file_name)
         while os.path.exists(final_path):
-            final_name = f'{norm_name}_{count}.{ext}'
-            final_path = os.path.join(dest_fold_im, final_name)
+            file_name = f'{norm_name}_{count}.{ext}'
+            os.rename(obj_path, ren_f)
+            final_path = os.path.join(dest_fold_im, file_name)
             count += 1
-            obj_path = os.path.join(dir_path, final_name)
-        img_files.append(norm_name)
-        know_ext.append(ext)
         shutil.move(obj_path, final_path)
+        img_files.append(file_name)
+        know_ext.append(ext)
 
     elif ext in vid_ext:
         count = 1
-        final_path = os.path.join(dest_fold_vid, final_name)
+        final_path = os.path.join(dest_fold_vid, file_name)
         while os.path.exists(final_path):
-            final_name = f'{norm_name}_{count}.{ext}'
-            final_path = os.path.join(dest_fold_vid, final_name)
+            file_name = f'{norm_name}_{count}.{ext}'
+            os.rename(obj_path, ren_f)
+            final_path = os.path.join(dest_fold_vid, file_name)
             count += 1
-            obj_path = os.path.join(dir_path, final_name)
-        img_files.append(norm_name)
-        know_ext.append(ext)
         shutil.move(obj_path, final_path)
-
+        img_files.append(file_name)
+        know_ext.append(ext)
     elif ext in doc_ext:
         count = 1
-        final_path = os.path.join(dest_fold_doc, final_name)
+        final_path = os.path.join(dest_fold_doc, file_name)
         while os.path.exists(final_path):
-            final_name = f'{norm_name}_{count}.{ext}'
-            final_path = os.path.join(dest_fold_doc, final_name)
+            file_name = f'{norm_name}_{count}.{ext}'
+            os.rename(obj_path, ren_f)
+            final_path = os.path.join(dest_fold_doc, file_name)
             count += 1
-            obj_path = os.path.join(dir_path, final_name)
-        img_files.append(norm_name)
-        know_ext.append(ext)
         shutil.move(obj_path, final_path)
+        img_files.append(file_name)
+        know_ext.append(ext)
 
     elif ext in mus_ext:
         count = 1
-        final_path = os.path.join(dest_fold_mus, final_name)
+        final_path = os.path.join(dest_fold_mus, file_name)
         while os.path.exists(final_path):
-            final_name = f'{norm_name}_{count}.{ext}'
-            final_path = os.path.join(dest_fold_mus, final_name)
+            file_name = f'{norm_name}_{count}.{ext}'
+            os.rename(obj_path, ren_f)
+            final_path = os.path.join(dest_fold_mus, file_name)
             count += 1
-            obj_path = os.path.join(dir_path, final_name)
-        img_files.append(norm_name)
-        know_ext.append(ext)
         shutil.move(obj_path, final_path)
-
+        img_files.append(file_name)
+        know_ext.append(ext)
     elif ext in arc_ext:
         with zipfile.ZipFile(obj_path, 'r') as zip_ref:
             archive_name = os.path.splitext(obj_path)[0]
@@ -127,18 +125,18 @@ def normalize(obj_path):
             zip_ref.extractall(archive_dir)
             os.remove(obj_path)
         count = 1
-        final_name = f'{norm_name}.{ext}'
+        final_path = os.path.join(dest_fold_arc, file_name)
         while os.path.exists(final_path):
-            final_name = f'{norm_name}_{count}.{ext}'
-            final_path = os.path.join(dest_fold_arc, final_name)
+            file_name = f'{norm_name}_{count}.{ext}'
+            os.rename(obj_path, ren_f)
+            final_path = os.path.join(dest_fold_arc, file_name)
             count += 1
-            obj_path = os.path.join(dir_path, final_name)
-        arc_files.append(norm_name)
-        know_ext.append(ext)
         shutil.move(obj_path, final_path)
+        img_files.append(file_name)
+        know_ext.append(ext)
     else:
         unknow_ext.append(ext)
-    return print(know_files, list(set(know_ext)), unknow_ext)
 
 
 sort(path)
+print(know_files, list(set(know_ext)), unknow_ext)
