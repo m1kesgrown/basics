@@ -51,6 +51,14 @@ def show_all_contacts():
 
 
 def main():
+
+    commands = {
+        'add': add_contact,
+        'change': change_phone_number,
+        'phone': get_phone_number,
+        'show_all': show_all_contacts
+    }
+
     while True:
         user_input = input('').lower()
 
@@ -64,28 +72,32 @@ def main():
 
         command_parts = user_input.split()
 
-        if command_parts[0] == 'add':
+        if command_parts[0] in commands:
             try:
-                name = command_parts[1]
-                phone_number = command_parts[2]
-                print(add_contact(name, phone_number))
+                command = command_parts[0]
+                if command == 'add':
+                    if len(command_parts) < 3:
+                        print('Give me name and phone please')
+                    else:
+                        result = commands[command](*command_parts[1:])
+                        print(result)
+                elif command == 'change':
+                    if len(command_parts) < 3:
+                        print('Give me name and phone please')
+                    else:
+                        result = commands[command](*command_parts[1:])
+                        print(result)
+                elif command == 'phone':
+                    if len(command_parts) < 2:
+                        print('Enter user name')
+                    else:
+                        result = commands[command](*command_parts[1:])
+                        print(result)
+                else:
+                    result = commands[command]()
+                    print(result)
             except IndexError:
                 print('Give me name and phone please')
-        elif command_parts[0] == 'change':
-            try:
-                name = command_parts[1]
-                new_phone_number = command_parts[2]
-                print(change_phone_number(name, new_phone_number))
-            except IndexError:
-                print('Give me name and phone please')
-        elif command_parts[0] == 'phone':
-            try:
-                name = command_parts[1]
-                print(get_phone_number(name))
-            except IndexError:
-                print('Enter user name')
-        elif user_input == 'show all':
-            print(show_all_contacts())
         else:
             print('Unknown command.')
 
